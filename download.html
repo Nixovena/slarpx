@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download - SLARPX</title>
+    <link rel="icon" type="image/png" href="Assets/slarpx.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html" class="brand">
+                <img src="Assets/slarpx.png" alt="Slarpx Logo">
+                SLARPX
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="releases.html">Releases</a></li>
+                <li><a href="docs.html">Docs</a></li>
+                <li><a href="download.html" class="active">Download</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="page-title">Download Slarpx</h1>
+        <div class="title-underline"></div>
+
+        <div class="download-wrapper">
+            <div class="download-content">
+                <div class="warning-text">
+                    Important Notice Before Downloading
+                </div>
+
+                <p
+                    style="color: #fff; font-size: 1.1rem; max-width: 700px; margin: 0 auto 30px auto; line-height: 1.5; font-family: var(--font-sans);">
+                    Slarpx is <strong>strictly not recommended for daily desktop use</strong>. It is highly experimental
+                    and enforces strict security policies that will interfere with standard workloads.
+                </p>
+
+                <div class="armor-plate"
+                    style="background: rgba(20,20,20,0.9); border-color: var(--accent-warning); margin: 0 auto 40px auto; max-width: 600px; font-size: 0.95rem; text-align: left;">
+                    <h3
+                        style="color: var(--accent-warning); margin-bottom: 10px; border-bottom: 1px solid var(--accent-warning);">
+                        Legal Disclaimer</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">By downloading this software, the user assumes full
+                        responsibility for potential data loss, hardware compatibility issues, or system instability.
+                    </p>
+                    <p style="color: #aaa;">Nixovena Labs holds no liability for actions taken by the Poison and
+                        Xennytsu security modules.</p>
+                </div>
+
+                <a href="https://sourceforge.net/projects/slarpx/files/release/hardenedslarpx-2.0-amd64.iso/download"
+                    class="btn-download">I Accept. Download Slarpx.</a>
+
+                <div class="download-details">
+                    <p style="margin-bottom: 10px;">Note: Verify the SHA256 checksum before installation.</p>
+                    <div
+                        style="background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid var(--border-hard); color: var(--accent-gold); font-family: var(--font-mono); display: inline-flex; align-items: center; gap: 15px; border-radius: 4px;">
+                        <span id="sha-string">9b11e0b52d7d1624e9a14dac91b46155e2642b5627ebcc293cd2c6b9a1ed16c2</span>
+                        <button
+                            onclick="navigator.clipboard.writeText(document.getElementById('sha-string').innerText); this.innerText='COPIED';"
+                            style="background: var(--text-bright); color: #000; border: none; padding: 4px 10px; font-family: var(--font-heading); cursor: pointer; text-transform: uppercase; font-size: 1rem; border-radius: 2px;">COPY</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            Developed by <a href="https://nixovena.org" style="color: inherit; text-decoration: underline;">Nixovena
+                Labs</a>.
+        </footer>
+    </div>
+
+</body>
+
+</html>

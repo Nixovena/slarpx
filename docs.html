@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docs - SLARPX</title>
+    <link rel="icon" type="image/png" href="Assets/slarpx.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        code {
+            background: #000;
+            color: var(--accent-gold, #c39a3f);
+            padding: 2px 6px;
+            border: 1px solid #333;
+        }
+
+        pre {
+            background: #000;
+            color: var(--accent-gold, #c39a3f);
+            padding: 15px;
+            border: 1px solid var(--border-hard);
+            border-left: 3px solid var(--accent-warning);
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        h3 {
+            color: var(--text-bright);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 1px dashed var(--border-hard);
+            padding-bottom: 5px;
+        }
+
+        .armor-plate ul {
+            list-style-type: square;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .armor-plate ul li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html" class="brand">
+                <img src="Assets/slarpx.png" alt="Slarpx Logo">
+                SLARPX
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="releases.html">Releases</a></li>
+                <li><a href="docs.html" class="active">Docs</a></li>
+                <li><a href="download.html">Download</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="page-title">Documentation</h1>
+        <div class="title-underline"></div>
+
+        <div class="armor-plate">
+            <h2>Slarpx Overview</h2>
+            <p>Hardened Slarpx is an advanced, security-oriented Debian derivative engineered to withstand highly
+                hostile network environments and persistent local threats. It abandons convenience in favor of absolute
+                system integrity. Slarpx operates under the assumption that the system is constantly under attack,
+                deploying stringent defense-in-depth methodologies across the kernel, network stack, package management,
+                and runtime environments.</p>
+        </div>
+
+        <div class="armor-plate" style="border-color: var(--accent-warning);">
+            <h2 style="color: var(--accent-warning); border-bottom-color: var(--accent-warning);">Critical Audience
+                Warning & Legal Disclaimer</h2>
+            <p><strong>TARGET AUDIENCE:</strong> This distribution is strictly designed for security researchers,
+                extreme threat-model environments, and isolated analytical workstations. It is fundamentally
+                incompatible with daily consumer workloads, standard gaming, or casual browsing.</p>
+            <p style="margin-top: 15px;"><strong>LIABILITY DISCLAIMER:</strong> Slarpx modifies low-level hardware
+                interactions, flushes volatile memory forcefully, and actively self-sabotages user-space processes if it
+                suspects intrusion. By deploying this system, the user waives <a href="https://nixovena.org"
+                    style="color: inherit; text-decoration: underline;">Nixovena Labs</a> of any liability regarding
+                hardware degradation, catastrophic data loss, or network isolation failures.</p>
+            <p style="margin-top: 15px; color: var(--text-muted);">Use exclusively at your own risk. Support is not
+                guaranteed for packages outside the minimal core.</p>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Post-Installation: Secure Boot Initialization</h2>
+            <p>Following the graphical installation, it is absolutely critical that the system administrator manually
+                configures and enables UEFI Secure Boot. The Slarpx kernel lock-down mechanisms
+                (integrity/confidentiality modes) rely heavily on the hardware trust anchors provided by Secure Boot.
+            </p>
+            <p style="margin-top: 15px;">For comprehensive instructions on establishing Secure Boot keys and enrolling
+                signatures, strictly adhere to <a href="https://wiki.debian.org/SecureBoot" target="_blank"
+                    style="text-decoration: underline;">the official Debian SecureBoot documentation</a>.</p>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Installation Process</h2>
+            <p>Slarpx installation utilizes a variant of the Debian graphical installer environment.</p>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Kernel Hardening Analysis</h2>
+            <p>This section provides a comprehensive technical analysis of the Kernel-level security and networking
+                hardening measures applied in the HardenedSlarpx distribution. The configurations reviewed orchestrate
+                one of the most aggressive security baselines available for Linux, closely following the Kernel Self
+                Protection Project (KSPP) guidelines. The settings span GRUB boot parameters and kernel
+                <code>sysctl</code> configurations.
+            </p>
+
+            <h3>1. Microarchitectural Mitigation (CPU Vulnerabilities)</h3>
+            <p><strong>File:</strong> <code>/etc/default/grub.d/40_cpu_mitigations.cfg</code></p>
+            <p>HardenedSlarpx adopts a "security over performance" philosophy. It forces all available hardware and
+                software mitigations for side-channel physical vulnerabilities:</p>
+            <ul>
+                <li><strong>Simultaneous Multithreading (SMT) Disabled:</strong> By setting <code>nosmt=force</code>,
+                    hyperthreading is completely disabled on the system. This drastically drops performance but
+                    fundamentally closes the attack vectors for severe cross-thread data leakage exploits (such as L1TF
+                    and MDS).</li>
+                <li><strong>Comprehensive Hardware Barriers:</strong> Strong mitigations are strictly enabled
+                    (<code>spectre_v2=on</code>, <code>spectre_bhi=on</code>). <code>retbleed=ibpb</code> forces
+                    hardware-level Indirect Branch Prediction Barriers instead of weaker software fallbacks.</li>
+                <li><strong>Microarchitectural Data Sampling (MDS & TAA):</strong> Forced cleared at borders via
+                    <code>mds=full,nosmt</code> and <code>tsx_async_abort=full,nosmt</code>. This ensures data processed
+                    cannot be skimmed by other malicious tenant processes.
+                </li>
+            </ul>
+
+            <h3>2. Kernel Memory and Process Protections</h3>
+            <p><strong>Files:</strong> <code>/etc/default/grub.d/40_kernel_hardening.cfg</code>,
+                <code>/etc/sysctl.d/sysctl.conf</code>
+            </p>
+            <p>Exploit mitigation is drastically heightened by destroying predictability and restricting process
+                interactions within kernel space:</p>
+            <ul>
+                <li><strong>Zeroing Memory:</strong> <code>init_on_alloc=1</code> and <code>init_on_free=1</code>
+                    ensures memory is completely overwritten with zeros before being given to or taken back from an
+                    application. It significantly stalls "Use-After-Free" exploit primitives.</li>
+                <li><strong>ASLR and Memory Predictability:</strong> Address Space Layout Randomization is fully
+                    deployed (<code>kernel.randomize_va_space=2</code>). Furthermore, <code>page_alloc.shuffle=1</code>
+                    randomizes physical page allocations, and <code>randomize_kstack_offset=on</code> randomizes stack
+                    offsets on every syscall, making ROP attacks incredibly difficult.</li>
+                <li><strong>Slab Integrity:</strong> Merging of slabs is prevented (<code>slab_nomerge</code>). This
+                    strictly silos cache allocations, meaning an attacker causing a heap overflow in one type of object
+                    cannot easily rewrite adjacent boundaries of another object type.</li>
+                <li><strong>Disabling Legacy Emulation:</strong> Vsyscalls and 32-bit compatibility
+                    (<code>vsyscall=none</code>, <code>vdso32=0</code>, <code>ia32_emulation=0</code>) are permanently
+                    disabled, shrinking the attack surface by discarding aging architecture wrappers heavily favored by
+                    exploit developers.</li>
+                <li><strong>CFI & KFENCE:</strong> Implements kernel Control Flow Integrity (<code>cfi=kcfi</code>) to
+                    structurally validate the destination of indirect branches. Additionally, the kernel electric-fence
+                    feature (<code>kfence.sample_interval=100</code>) catches out-of-bounds heap operations.</li>
+                <li><strong>/proc/PID/mem Blocking:</strong> Forces <code>proc_mem.force_override=never</code> which
+                    prevents an application (or an attacker) from exploiting the FOLL_FORCE flag to overwrite protected
+                    local memory through the procfs interface. BPF is also fundamentally disabled for unprivileged users
+                    (<code>unprivileged_bpf_disabled=1</code>).</li>
+            </ul>
+
+            <h3>3. Direct Memory Access (DMA) Defense</h3>
+            <p><strong>File:</strong> <code>/etc/default/grub.d/40_kernel_hardening.cfg</code></p>
+            <p>To neutralize external hardware exploits (e.g. plugging a malicious Thunderbolt/PCIe device to suck keys
+                directly out of RAM):</p>
+            <ul>
+                <li><strong>Universal IOMMU Translation:</strong> Forces IOMMU isolation (<code>intel_iommu=on</code>,
+                    <code>amd_iommu=force_isolation</code>). Ensures that device memory mappings are strictly verified.
+                </li>
+                <li><strong>Synchronous TLB Denial:</strong> <code>iommu.strict=1</code> disables lazy flushing. While
+                    demanding on performance, it ensures old DMA mappings are purged synchronously, meaning physical
+                    devices cannot fetch "stale" data from memory.</li>
+                <li><strong>Pre-Kernel EFI Restriction:</strong> <code>efi=disable_early_pci_dma</code> severs the
+                    busmaster bit on PCI bridges before the kernel even initializes the IOMMU, closing the temporary
+                    boot-time window vulnerability.</li>
+            </ul>
+
+            <h3>4. Drastic System Integrity & Panic Policies</h3>
+            <p><strong>Files:</strong> <code>/etc/default/grub.d/40_kernel_hardening.cfg</code>,
+                <code>/etc/default/grub.d/41_recovery_restrict.cfg</code>, <code>/etc/sysctl.d/sysctl.conf</code>
+            </p>
+            <p>Once compromised, it is better for the machine to stop than to serve the attacker:</p>
+            <ul>
+                <li><strong>Aggressive Panic Protocol:</strong> Using parameters like <code>oops=panic</code>,
+                    <code>panic_on_warn=1</code>, and <code>panic_on_oops=1</code>, the kernel will instantly panic and
+                    shutdown if it detects a serious internal error or an execution path warning—classic indicators of
+                    memory corruption exploits in progress.
+                </li>
+                <li><strong>Tainted Kernel Rejection:</strong> The <code>panic_on_taint=0xC0924</code> parameter forces
+                    the machine to halt if out-of-scope hardware, firmware bugs, or debug mutating events are loaded.
+                </li>
+                <li><strong>No Recovery Console:</strong> Standard recovery options like the grub "single-user" mode or
+                    the Dracut emergency shell are disabled. Instead of dropping into a root shell upon boot failure,
+                    the system halts, frustrating an attacker attempting to exploit physical access without credentials.
+                </li>
+                <li><strong>Lockdown Mode:</strong> Kicks the kernel into <code>lockdown=integrity</code> mode,
+                    stripping root's ability to modify kernel space memory or execute raw port operations, preventing
+                    lateral movement from userland root to ring-0.</li>
+            </ul>
+
+            <h3>5. Network Stack Hardening (TCP/IP)</h3>
+            <p><strong>File:</strong> <code>/etc/sysctl.d/sysctl.conf</code></p>
+            <p>An exhaustive networking clampdown designed to deter Man-in-the-Middle (MitM), Spoofing, and Denial of
+                Service (DoS) attacks:</p>
+            <ul>
+                <li><strong>Routing & Redirects Blocked:</strong> IP forwarding is disabled. It rejects all ICMP routing
+                    redirects and Source Routing (preventing attackers from determining the network path).</li>
+                <li><strong>Anti-Spoofing:</strong> Strict Reverse Path Filtering (<code>rp_filter=1</code>) validates
+                    that the source IP comes from the logical corresponding interface. ARP gratuitous updates and
+                    ignores are tuned to block MAC-address spoofing and poisoning.</li>
+                <li><strong>DDoS/Flood Mitigation:</strong> SYN cookies are enabled to fend off SYN floods. ICMP is
+                    constrained by rate limits, and broadcast echo requests are completely ignored, eliminating
+                    participating in Smurf amplifier attacks.</li>
+                <li><strong>Cryptography & Entropy:</strong> Disables trusting the proprietary and closed-source CPU
+                    (<code>random.trust_cpu=off</code>) and bootloader Random Number Generators, insisting the Linux
+                    kernel mixes its own cryptographic entropy.</li>
+                <li><strong>IPv6 Disabled:</strong> <code>ipv6.disable=1</code> is injected into GRUB to reduce the vast
+                    attack surface of the IPv6 networking stack if it is not strictly required.</li>
+            </ul>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Network Hardening Analysis</h2>
+            <p>The network hardening architecture in HardenedSlarpx utilizes a dual approach: a highly restrictive
+                ingress/egress firewall (<code>nftables</code>) and an immutable, enforced DNS management system. This
+                strategy is designed to protect against internal data exfiltration, thwart local network attacks, and
+                deter broad-spectrum Internet reconnaissance.</p>
+
+            <h3>1. Nftables Firewall (Ingress & Egress Filtering)</h3>
+            <p><strong>File:</strong> <code>/etc/nftables.conf</code></p>
+            <p>Unlike typical desktop firewalls that only block incoming traffic, HardenedSlarpx dictates a strict
+                <strong>"Default Drop"</strong> policy on both incoming (<code>input</code>) and outgoing
+                (<code>output</code>) chains. This serves as a significant hurdle for malware looking to communicate
+                outside the local machine.
+            </p>
+
+            <p><strong>Key Ingress (Incoming) Protections:</strong></p>
+            <ul>
+                <li><strong>Anti-Spoofing & Network Layer Validation:</strong> Network packets claiming to originate
+                    from loopback addresses that arrive via external physical interfaces are immediately dropped.
+                    Invalid connection states are proactively blocked.</li>
+                <li><strong>Port Scan Detection:</strong> The firewall scrutinizes TCP flags heavily. Packets carrying
+                    illegal or suspicious combinations indicative of port scanning are silently discarded.</li>
+                <li><strong>DDoS/SYN Flood Resilience:</strong> A soft cap on new TCP connection requests (SYN packets)
+                    limits the flow to 30 requests per second. The ICMP ping limits are set to 20/second, neutralizing
+                    "Ping of Death" or standard network saturation attempts.</li>
+                <li><strong>SSH Brute-Force Tracking:</strong> SSH requests are dynamically rate-limited. If an external
+                    IP attempts more than 3 connections per minute, the firewall dynamically injects that IP address
+                    into a penalty set and automatically drops subsequent connection attempts for 10 minutes.</li>
+            </ul>
+
+            <p><strong>Key Egress (Outgoing) Protections:</strong></p>
+            <ul>
+                <li><strong>Anti-Exfiltration Policy:</strong> The firewall blocks all outbound Internet traffic by
+                    default. It relies on an explicit "Allowlist" configuration.</li>
+                <li><strong>Restricted Output Types:</strong> Only highly standard end-user protocols are permitted
+                    outbound (e.g., HTTP/80, HTTPS/TCP 443, QUIC/UDP 443, SSH, Mail ports, and essential local
+                    multicast).</li>
+                <li><strong>DNS Server Whitelisting:</strong> Standard port 53 outbound traffic is heavily inspected.
+                    The firewall <strong>only</strong> allows DNS traffic designated for a hardcoded set of Trusted DNS
+                    Providers (such as Cloudflare <code>1.1.1.1</code> and Quad9 <code>9.9.9.9</code>).</li>
+            </ul>
+
+            <h3>2. DNS Guard (Immutable Static DNS Enforcement)</h3>
+            <p><strong>File:</strong> <code>/etc/systemd/system/slarpx-dns.service</code></p>
+            <p><strong>Purpose:</strong> It is a common vulnerability on modern operating systems that DHCP assignments,
+                local routers, or Network Management daemons will automatically overwrite <code>/etc/resolv.conf</code>,
+                effectively intercepting the user's DNS queries. HardenedSlarpx resolves this via a dedicated systemd
+                service.</p>
+            <ul>
+                <li><strong>Absolute Enforcement (chattr +i):</strong> The <code>slarpx-dns</code> service runs at boot
+                    up, immediately enforcing a static DNS configuration by completely overriding the local resolver. It
+                    then relies on the <code>CAP_LINUX_IMMUTABLE</code> capability to run the <code>chattr +i</code>
+                    shell command, applying an immutable file tag to <code>/etc/resolv.conf</code>.</li>
+                <li><strong>Daemon Sandboxing:</strong> Even though this service requires high privileges to wipe and
+                    restrict <code>/etc/resolv.conf</code>, the daemon executing it is strongly sandboxed contextually
+                    by <code>systemd</code>. It drops access using <code>NoNewPrivileges=yes</code>,
+                    <code>PrivateDevices=yes</code>, and <code>MemoryDenyWriteExecute=yes</code> to ensure the script
+                    itself cannot be co-opted.
+                </li>
+            </ul>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Security Engines Detailed Analysis</h2>
+            <p>The HardenedSlarpx distribution utilizes three powerful, custom backend security engines (daemons)
+                designed to protect the operating system's security and integrity. These engines ensure the system is
+                protected against various threat vectors: <strong>Poison</strong> (Timing Disruption),
+                <strong>Silencer</strong> (Information Leak Prevention), and <strong>Xennytsu</strong> (Advanced
+                Behavioral Analysis & EDR).
+            </p>
+
+            <h3>1. POISON (Timing Disruption Engine)</h3>
+            <p><strong>Purpose:</strong> Instead of completely blocking malicious or suspicious process attempts, this
+                engine actively disrupts them by dynamically <strong>slowing</strong> them down. This approach is
+                generally used to sabotage buffer-overflow or race conditions that exploits rely on.</p>
+            <ul>
+                <li><strong>Kernel-Level Monitoring with Fanotify:</strong> Uses the <code>fanotify</code>
+                    infrastructure to monitor file operations across critical paths and temporary working directories.
+                </li>
+                <li><strong>Smart Threat Scoring:</strong> Whenever a new process starts, it is stored in a hash table.
+                    The process's threat score increases if it tampers with privileged files, is launched directly from
+                    a <code>tmpfs</code> root, or if its parent is a suspicious scripting language.</li>
+                <li><strong>Adaptive Micro-Delay (Jittering):</strong> If a suspicious process is targeted, the system
+                    adds a dynamically calculated, random microsecond-level <code>usleep()</code> pause right before a
+                    file read operation takes place. These tiny slowdowns do not crash the system, but they cause
+                    suspicious payloads to hit timeouts or break the connection.</li>
+                <li><strong>Immunity (Whitelist):</strong> Core operating system services (<code>systemd</code>,
+                    <code>dbus</code>) and common user applications are exempt from this delay process, ensuring
+                    day-to-day performance is not degraded.
+                </li>
+            </ul>
+
+            <h3>2. SILENCER (Kernel Info Leak Prevention Engine)</h3>
+            <p><strong>Purpose:</strong> Limits privilege escalation vulnerabilities in the system environment and
+                prevents reconnaissance operations where an attacker or malicious application tries to gather
+                information about the system.</p>
+            <ul>
+                <li><strong>Process Isolation (Hidepid):</strong> Mounts the <code>/proc</code> directory with the
+                    <code>hidepid=invisible</code> option. When any unprivileged user runs tools like <code>ps</code> or
+                    <code>top</code>, they cannot see the processes belonging to other users.
+                </li>
+                <li><strong>Tamper-Guard:</strong> Enforces strict regimes on the most sensitive kernel security
+                    (sysctl) settings under <code>/proc/sys/kernel/</code>, such as <code>yama/ptrace_scope</code>,
+                    <code>kptr_restrict</code>, and <code>dmesg_restrict</code>. It continuously checks these settings
+                    in a loop. If an attempt is made to alter them, it immediately reverts them back to their secure
+                    states.
+                </li>
+                <li><strong>Filesystem Hardening:</strong> Locks down the <code>/boot</code> directory and kernel module
+                    build paths from ordinary users. It also revokes world-readable status from logs inside
+                    <code>/var/log</code>.
+                </li>
+                <li><strong>Blocking Independent Analysis Modules:</strong> Restricts the permission chains of tools
+                    like <code>gcc</code>, <code>gdb</code>, <code>strace</code>, <code>nmap</code>, and
+                    <code>tcpdump</code> which an attacker could use for lateral movement within the system.
+                </li>
+            </ul>
+
+            <h3>3. XENNYTSU (Behavioral Execution Guard)</h3>
+            <p><strong>Purpose:</strong> Acts as an ultra-low-footprint, modern EDR mechanism. By analyzing the
+                operating system, process trees, and memory in real-time, it instantly detects malicious activities and
+                ruthlessly kills the process with a hardware <code>SIGKILL</code>.</p>
+            <ul>
+                <li><strong>Malicious Command and Reverse Shell Detection:</strong> Xennytsu monitors command arguments
+                    (<code>cmdline</code>) to instantly detect if a command is attempting to open a reverse shell.
+                    Furthermore, it is capable of identifying the execution of base64 encoded payloads by format.</li>
+                <li><strong>Memory Manipulation Detection (Memory Maps):</strong> Inspects the file descriptors (FDs)
+                    and memory maps (<code>/proc/pid/maps</code>) of running processes. It spots anonymous executable
+                    regions or fileless rootkit/shellcode traces loaded into memory, scoring them highly for immediate
+                    destruction.</li>
+                <li><strong>Environment Variable Scanning (Env Guards):</strong> Blocks dangerous shell variable
+                    manipulations or entries like <code>LD_PRELOAD</code> and <code>LD_LIBRARY_PATH</code>.</li>
+                <li><strong>Malicious Parent-Child Compatibility Detection:</strong> In a rational system hierarchy, an
+                    execution like <code>/bin/bash</code> suddenly spawning from under <code>nginx</code> is highly
+                    suspicious. Xennytsu utilizes a hierarchical inspection mechanism that terminates the process the
+                    moment a threat score exceeds 70.</li>
+            </ul>
+        </div>
+
+        <div class="armor-plate">
+            <h2>System Hardening Analysis</h2>
+            <p>The HardenedSlarpx distribution implements a robust, multi-layered "Defense in Depth" strategy by
+                hardening various aspects of the operating system configuration. The hardening configurations are deeply
+                embedded within the system's package management, hardware modules, user environments, physical access
+                vectors, and boot/shutdown processes.</p>
+
+            <h3>1. Package Management Security (APT Hardening)</h3>
+            <ul>
+                <li><strong>Strict Cryptographic Verification:</strong> Enforces strict TLS/HTTPS peer and host
+                    verification for all repositories. It explicitly blocks unauthenticated packages and insecure
+                    downgrade operations.</li>
+                <li><strong>Sandboxing & Privilege Drop:</strong> APT execution is placed securely inside a
+                    <code>seccomp-bpf</code> sandbox, which limits the system calls the process can make. Moreover, the
+                    download operations are executed by the unprivileged <code>_apt</code> user rather than
+                    <code>root</code>.
+                </li>
+                <li><strong>Integrity over Bandwidth:</strong> PDiffs are disabled, forcing full index downloads to
+                    guarantee checksum integrity. Local package caches (<code>.deb</code> files) are automatically
+                    cleaned after installation to save space and reduce local tampering risks.</li>
+            </ul>
+
+            <h3>2. Hardware and Kernel Module Restrictions</h3>
+            <ul>
+                <li><strong>DMA & Physical Attacks:</strong> Firewire and Thunderbolt modules are explicitly disabled to
+                    mitigate Direct Memory Access (DMA) attacks where an attacker could theoretically read system memory
+                    directly via a connected hardware device.</li>
+                <li><strong>Privacy & Telemetry Blockers:</strong> GPS hardware modules and Intel's Platform Monitoring
+                    Technology are blocked to prevent location tracking and hardware-level data collection.</li>
+                <li><strong>Filesystem & Network Attack Surface:</strong> Old/legacy network file systems (NFS, CIFS,
+                    GFS2) and obsolete network protocols are blocked. Rare filesystems and obsolete framebuffer graphics
+                    drivers are also disabled.</li>
+                <li><strong>Entropy Generation:</strong> The <code>jitterentropy_rng</code> module is forcefully loaded
+                    on boot, guaranteeing a strong, non-deterministic source of random numbers (entropy) which is
+                    critical for early-boot cryptographic operations.</li>
+            </ul>
+
+            <h3>3. Bluetooth Security</h3>
+            <ul>
+                <li><strong>Time Limits:</strong> The Discoverable and Pairable modes are strictly limited to an
+                    aggressive timeout of 30 seconds.</li>
+                <li><strong>Maximum Controllers:</strong> Only 1 Bluetooth controller is allowed, and any subsequently
+                    plugged-in adapters are ignored.</li>
+                <li><strong>Privacy (RPA):</strong> The Bluetooth stack uses Randomized Private Addresses (RPA)
+                    (<code>Privacy=network/on</code>), making it exceptionally difficult to track the device based on
+                    its Bluetooth MAC address.</li>
+            </ul>
+
+            <h3>4. Shell and User Environment Hardening</h3>
+            <ul>
+                <li><strong>Anti-Forensics & Session Timeouts:</strong> Shell command history is completely disabled
+                    (<code>HISTFILE=/dev/null</code> and wiped at exit) preventing local attackers from uncovering
+                    sensitive commands. Idle sessions are automatically terminated after 15 minutes of inactivity.</li>
+                <li><strong>Strict File Permissions:</strong> A global <code>umask 077</code> is enforced, meaning any
+                    new file or directory created by a user is strictly private (readable/writable only by the owner).
+                </li>
+                <li><strong>Resource Constraints:</strong> Core dumps are completely disabled at both the shell and
+                    system level (<code>core 0</code>), ensuring application crashes don't leak physical
+                    memory/passwords to the disk. Stack sizes are limited to help mitigate buffer overflow attacks.</li>
+                <li><strong>Compiler Restrictions:</strong> By checking the UID, non-root users are explicitly denied
+                    access to compiler tools (<code>gcc</code>, <code>make</code>, <code>cc</code>), stopping local
+                    attackers from compiling rootkits or local exploits on the machine.</li>
+                <li><strong>Brute-Force Protection:</strong> Leveraging PAM <code>faillock</code>, user accounts are
+                    temporary locked for 5 minutes after 5 consecutive failed authentication attempts.</li>
+            </ul>
+
+            <h3>5. Execution Privileges (Sudo Security)</h3>
+            <ul>
+                <li>A very strict <code>umask=0077</code> applies to files created via sudo.</li>
+                <li>Commands run via sudo are executed in a dedicated pseudo-terminal (<code>use_pty</code>),
+                    neutralizing terminal hijacking exploits. It also requires an actual TTY context
+                    (<code>requiretty</code>).</li>
+                <li>The security timeout for cached <code>sudo</code> passwords is significantly shortened to 2 minutes.
+                    All environmental variables are fully stripped, maintaining only a secure binary executable path.
+                </li>
+            </ul>
+
+            <h3>6. Systemd Hardening and Anti-Cold Boot Measures</h3>
+            <ul>
+                <li><strong>Permission Hardening:</strong> This is a boot-time service designed to correct system
+                    permissions. Systemd itself encapsulates this service tightly using deep sandboxing and only assigns
+                    the direct privileges needed for file ownership and immutable tag modification capabilities.</li>
+                <li><strong>Protection Against Cold Boot Attacks:</strong> Cold boot attacks act by suddenly cutting
+                    power to the machine and stripping out the RAM sticks to extract encryption keys. This service
+                    explicitly runs precisely before system halts or reboots, overwriting swap memory and flushing
+                    critical buffers, rendering the data extraction useless.</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            Developed by <a href="https://nixovena.org" style="color: inherit; text-decoration: underline;">Nixovena
+                Labs</a>.
+        </footer>
+    </div>
+
+</body>
+
+</html>

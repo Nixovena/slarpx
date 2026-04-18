@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEPLOYMENTS - SLARPX</title>
+    <link rel="icon" type="image/png" href="Assets/slarpx.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html" class="brand">
+                <img src="Assets/slarpx.png" alt="Slarpx Logo">
+                SLARPX
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="releases.html" class="active">Releases</a></li>
+                <li><a href="docs.html">Docs</a></li>
+                <li><a href="download.html">Download</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="page-title">Release Notes</h1>
+        <div class="title-underline"></div>
+
+        <div class="armor-plate">
+            <h2>Version 2.0</h2>
+            <p style="font-style: italic; color: var(--text-muted); margin-bottom: 20px;">Major Security and Stability
+                Updates</p>
+            <ul style="list-style-type: square; padding-left: 20px;">
+                <li style="margin-bottom: 10px;">Xennytsu and Poison security modules heavily improved.</li>
+                <li style="margin-bottom: 10px;">False positive execution block rates in Xennytsu and Poison
+                    significantly reduced.</li>
+                <li style="margin-bottom: 10px;">Fixed multiple security vulnerabilities and broken execution mechanics
+                    in Xennytsu and Poison.</li>
+                <li style="margin-bottom: 10px; color: var(--accent-warning);"><strong>New security engine introduced:
+                        Silencer.</strong> Focuses exclusively on preventing kernel information and memory leaks.</li>
+                <li style="margin-bottom: 10px;">grub.d core settings updated to resolve system hardening conflicts.
+                </li>
+                <li style="margin-bottom: 10px;">General framework logic bugs fixed.</li>
+                <li style="margin-bottom: 10px;">Critical sudo bug in the Debian installer framework fixed to ensure
+                    robust root staging.</li>
+            </ul>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Version 1.0</h2>
+            <p style="font-style: italic; color: var(--text-muted); margin-bottom: 20px;">Initial System Release</p>
+            <ul style="list-style-type: square; padding-left: 20px;">
+                <li style="margin-bottom: 10px;">Hardened Slarpx core image released.</li>
+                <li style="margin-bottom: 10px;">Initial integration of the Poison security layer.</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            Developed by <a href="https://nixovena.org" style="color: inherit; text-decoration: underline;">Nixovena
+                Labs</a>.
+        </footer>
+    </div>
+
+</body>
+
+</html>

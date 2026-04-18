@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HARDENED SLARPX</title>
+    <link rel="icon" type="image/png" href="Assets/slarpx.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html" class="brand">
+                <img src="Assets/slarpx.png" alt="Slarpx Logo">
+                SLARPX
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Overview</a></li>
+                <li><a href="releases.html">Releases</a></li>
+                <li><a href="docs.html">Docs</a></li>
+                <li><a href="download.html">Download</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="page-title">Overview</h1>
+        <div class="title-underline"></div>
+
+        <div class="armor-plate">
+            <h2>Strict Security-First Architecture</h2>
+            <p>Hardened Slarpx is a Debian-based Linux distribution built with a strict security-first approach. It uses
+                a multi-layered defense model with aggressive mitigations and extensive kernel-level hardening. Slarpx
+                enforces system integrity through strict structural restrictions.</p>
+            <br>
+            <p>Due to its restrictive firewall policy, certain anonymization tools and network protocols are
+                intentionally unsupported. The system focuses on active intervention and termination of unauthorized
+                attack paths.</p>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Runtime Security Modules</h2>
+            <ul style="list-style-type: square; padding-left: 20px; margin-top: 10px;">
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--text-bright);">Poison :</strong>
+                    Actively disrupts malicious executions by injecting dynamic micro-delays to sabotage race conditions
+                    and buffer-overflow attempts.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--text-bright);">Xennytsu :</strong>
+                    Acts as an ultra-low-footprint EDR, instantly detecting reverse shells, memory injections, and
+                    hostile process hierarchies for immediate termination.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--text-bright);">Silencer :</strong>
+                    Limits privilege escalation and reconnaissance via strict process isolation (hidepid), continuous
+                    sysctl tamper-guarding, and restrictive filesystem permissions.
+                </li>
+            </ul>
+        </div>
+
+        <div class="armor-plate">
+            <h2>Core Hardening Domains</h2>
+            <ul style="list-style-type: square; padding-left: 20px; margin-top: 10px;">
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--text-bright);">Kernel & Memory :</strong>
+                    Aggressive CPU side-channel mitigations, memory zeroing, and strict ASLR implementations.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--text-bright);">Network Isolation :</strong>
+                    Default-drop nftables firewall policy combined with an immutable DNS enforcement mechanism.
+                </li>
+                <li style="margin-bottom: 15px;">
+                    <strong style="color: var(--text-bright);">System & Environment :</strong>
+                    Restricted APT sandboxing, Bluetooth telemetry blocking, and anti-cold-boot memory flushing.
+                </li>
+            </ul>
+        </div>
+
+        <div class="armor-plate" style="text-align: center;">
+            <img src="Assets/slarpx-de.png" alt="Slarpx Desktop interface"
+                style="max-width: 100%; border: 2px solid var(--border-hard); box-shadow: 0 0 10px #000;">
+            <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-muted);">Slarpx Desktop Environment - CLI
+                Only</p>
+        </div>
+
+        <footer class="footer">
+            Developed by <a href="https://nixovena.org" style="color: inherit; text-decoration: underline;">Nixovena
+                Labs</a>.
+        </footer>
+    </div>
+
+</body>
+
+</html>
