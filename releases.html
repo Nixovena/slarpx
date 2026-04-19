@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEPLOYMENTS - SLARPX</title>
+    <title>Releases - SLARPX</title>
     <link rel="icon" type="image/png" href="Assets/slarpx.png">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -27,6 +27,15 @@
 
         <h1 class="page-title">Release Notes</h1>
         <div class="title-underline"></div>
+
+        <div class="armor-plate">
+            <h2>Version 2.1</h2>
+            <p style="font-style: italic; color: var(--text-muted); margin-bottom: 20px;">Hardening and System Maintenance</p>
+            <ul style="list-style-type: square; padding-left: 20px;">
+                <li style="margin-bottom: 10px;">Fixed sysctl.conf initramfs error.</li>
+                <li style="margin-bottom: 10px;">Disabled sysctl.conf IPv6 settings (Note: This may report an error as IPv6 is already disabled at the kernel level).</li>
+            </ul>
+        </div>
 
         <div class="armor-plate">
             <h2>Version 2.0</h2>
